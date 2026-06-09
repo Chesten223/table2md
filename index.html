@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Table to Markdown — Free Table Converter</title>
+<meta name="description" content="Convert HTML tables, CSV, and TSV to Markdown table format instantly. Free online tool with alignment detection, colSpan/rowSpan support, and live preview.">
+<meta name="keywords" content="HTML to Markdown, table converter, CSV to Markdown, TSV to Markdown, Markdown table generator">
+<link rel="canonical" href="https://table2md.pages.dev/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="HTML Table to Markdown — Free Table Converter">
+<meta property="og:description" content="Convert HTML tables, CSV, and TSV to Markdown table format instantly. Free online tool with alignment detection and live preview.">
+<meta property="og:url" content="https://table2md.pages.dev/">
+<meta property="og:site_name" content="Table2MD">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HTML Table to Markdown — Free Table Converter">
+<meta name="twitter:description" content="Convert HTML tables, CSV, and TSV to Markdown tables instantly.">
+
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "HTML Table to Markdown Converter",
+  "url": "https://table2md.pages.dev/",
+  "description": "Convert HTML tables, CSV, and TSV to Markdown table format instantly with alignment detection and live preview.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "browserRequirements": "Requires JavaScript"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I convert an HTML table to Markdown?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Paste your HTML table code into the input area. The converter automatically detects the table and outputs valid Markdown table syntax. You can also drag and drop an .html file."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does the tool support merged cells (colspan/rowspan)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Merged columns (colspan) are expanded by repeating the cell content. Merged rows (rowspan) are filled in subsequent rows. Markdown does not natively support spanning, so the content is duplicated to preserve data integrity."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I convert CSV or TSV to a Markdown table?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Select the CSV or TSV input mode, paste your data, and the first row is treated as the header. The tool handles quoted fields and tab-separated values automatically."
+      }
+    }
+  ]
+}
+</script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#c9d1d9;--text2:#8b949e;--accent:#58a6ff;--accent2:#388bfd;--green:#3fb950;--red:#f85149}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+header{border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{font-size:20px;font-weight:700;color:var(--text)}
+.logo span{color:var(--accent)}
+nav{display:flex;gap:16px;font-size:14px}
+
+.container{max-width:1280px;margin:0 auto;padding:24px}
+
+h1{font-size:28px;font-weight:700;margin-bottom:8px}
+.subtitle{color:var(--text2);font-size:16px;margin-bottom:24px}
+
+.mode-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.mode-tab{padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.mode-tab:hover{border-color:var(--accent);color:var(--text)}
+.mode-tab.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:768px){.panels{grid-template-columns:1fr}}
+
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.panel-header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--text2)}
+.panel-header button{padding:4px 12px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;cursor:pointer;transition:all .15s}
+.panel-header button:hover{border-color:var(--accent);color:var(--accent)}
+
+textarea{width:100%;min-height:320px;padding:16px;border:none;background:transparent;color:var(--text);font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;font-size:13px;resize:vertical;outline:none;line-height:1.5;tab-size:2}
+textarea::placeholder{color:var(--text2)}
+
+.output-area{padding:16px;font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;font-size:13px;white-space:pre-wrap;word-break:break-word;min-height:320px;line-height:1.5;color:var(--text)}
+
+.warning{background:#3d2e00;border:1px solid #6d4c00;color:#e3b341;padding:8px 12px;border-radius:6px;font-size:13px;margin-bottom:12px;display:none}
+.warning.show{display:block}
+
+.section{margin-bottom:48px}
+.section h2{font-size:22px;margin-bottom:16px;font-weight:600}
+.section h3{font-size:17px;margin-bottom:8px;font-weight:600;color:var(--text)}
+
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.feature{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px}
+.feature h3{margin-bottom:8px;color:var(--accent);font-size:15px}
+.feature p{color:var(--text2);font-size:14px}
+
+.faq{max-width:720px}
+.faq-item{border-bottom:1px solid var(--border);padding:16px 0}
+.faq-item h3{cursor:pointer;font-size:15px;color:var(--text);display:flex;justify-content:space-between;align-items:center}
+.faq-item h3::after{content:'+';color:var(--text2);font-size:18px;transition:transform .2s}
+.faq-item.open h3::after{transform:rotate(45deg)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .3s ease;color:var(--text2);font-size:14px}
+.faq-item.open .faq-answer{max-height:200px;margin-top:8px}
+
+.email-widget{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;text-align:center}
+.email-widget p{color:var(--text2);margin-bottom:12px;font-size:14px}
+.email-form{display:flex;gap:8px;max-width:400px;margin:0 auto}
+.email-form input{flex:1;padding:8px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none}
+.email-form input:focus{border-color:var(--accent)}
+.email-form button{padding:8px 16px;border-radius:6px;border:none;background:var(--accent2);color:#fff;font-size:14px;cursor:pointer;font-weight:500}
+.email-form button:hover{background:var(--accent)}
+
+.preview-area{padding:16px;font-size:14px;overflow-x:auto}
+.preview-area table{border-collapse:collapse;width:100%}
+.preview-area th,.preview-area td{border:1px solid var(--border);padding:8px 12px;text-align:left}
+.preview-area th{background:var(--bg3);font-weight:600}
+
+.cross-links{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--text2)}
+.cross-links a{color:var(--accent)}
+
+footer{border-top:1px solid var(--border);padding:24px;text-align:center;color:var(--text2);font-size:13px}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#fff;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Table<span>2MD</span></div>
+  <nav>
+    <a href="#converter">Converter</a>
+    <a href="#features">Features</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <section id="converter">
+    <h1>HTML Table to Markdown Converter</h1>
+    <p class="subtitle">Paste your HTML table, CSV, or TSV and get clean Markdown instantly.</p>
+
+    <div class="warning" id="nestedWarning">⚠ Nested tables detected — only the outermost table is converted. Inner tables are flattened to text content.</div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="html">HTML Table</button>
+      <button class="mode-tab" data-mode="csv">CSV</button>
+      <button class="mode-tab" data-mode="tsv">TSV</button>
+    </div>
+
+    <div class="panels">
+      <div class="panel">
+        <div class="panel-header">
+          <span>Input</span>
+          <button onclick="document.getElementById('input').value='';convert()">Clear</button>
+        </div>
+        <textarea id="input" placeholder="Paste your HTML table here, e.g.&#10;<table>&#10;  <tr><th>Name</th><th>Age</th></tr>&#10;  <tr><td>Alice</td><td>30</td></tr>&#10;</table>" spellcheck="false"></textarea>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span>Markdown Output</span>
+          <div style="display:flex;gap:6px">
+            <button onclick="copyOutput()">Copy</button>
+            <button onclick="togglePreview()">Preview</button>
+          </div>
+        </div>
+        <div class="output-area" id="output"></div>
+        <div class="preview-area" id="preview" style="display:none"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <h2>Features</h2>
+    <div class="features">
+      <div class="feature">
+        <h3>Span-Aware Conversion</h3>
+        <p>Handles colspan and rowspan attributes correctly. Merged cells are expanded so every Markdown row has the same column count, preserving your data.</p>
+      </div>
+      <div class="feature">
+        <h3>Alignment Detection</h3>
+        <p>Detects inline styles like <code>text-align: center</code> and translates them to Markdown alignment syntax — left (<code>:---</code>), center (<code>:---:</code>), and right (<code>---:</code>).</p>
+      </div>
+      <div class="feature">
+        <h3>CSV &amp; TSV Support</h3>
+        <p>Not just HTML — paste comma-separated or tab-separated data and get a clean Markdown table. Quoted fields with embedded commas are handled correctly.</p>
+      </div>
+      <div class="feature">
+        <h3>Live Preview</h3>
+        <p>See a rendered preview of your Markdown table right inside the tool. Instant conversion as you type — no buttons, no waiting.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <h3>How do I convert an HTML table to Markdown?</h3>
+        <div class="faq-answer">Paste your HTML table code into the input area. The converter automatically detects the table and outputs valid Markdown table syntax. You can also drag and drop an .html file onto the textarea.</div>
+      </div>
+      <div class="faq-item">
+        <h3>Does the tool support merged cells (colspan/rowspan)?</h3>
+        <div class="faq-answer">Yes. Merged columns (colspan) are expanded by repeating the cell content. Merged rows (rowspan) are filled in subsequent rows. Markdown does not natively support spanning, so the content is duplicated to preserve data integrity.</div>
+      </div>
+      <div class="faq-item">
+        <h3>Can I convert CSV or TSV to a Markdown table?</h3>
+        <div class="faq-answer">Yes. Select the CSV or TSV input mode, paste your data, and the first row is treated as the header. The tool handles quoted fields and tab-separated values automatically.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <div class="email-widget">
+      <h2>Feedback &amp; Suggestions</h2>
+      <p>Found a bug or have a feature request? Drop us a message.</p>
+      <form class="email-form" onsubmit="sendFeedback(event)">
+        <input type="email" placeholder="you@example.com" required id="feedbackEmail">
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Related Tools</h2>
+    <div class="cross-links">
+      <a href="https://markdowntables.com">Markdown Tables Generator</a>
+      <a href="https://tableconvert.com">Table Convert</a>
+      <a href="https://htmltidy.net">HTML Tidy</a>
+      <a href="https://csvlint.io">CSV Lint</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 Table2MD — Free HTML Table to Markdown Converter</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+let currentMode = 'html';
+let showingPreview = false;
+
+// Mode tabs
+$$('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    $$('.mode-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentMode = tab.dataset.mode;
+    const input = $('#input');
+    if (currentMode === 'html') input.placeholder = 'Paste your HTML table here...';
+    else if (currentMode === 'csv') input.placeholder = 'Name,Age,City\nAlice,30,NYC\nBob,25,LA';
+    else input.placeholder = 'Name\tAge\tCity\nAlice\t30\tNYC\nBob\t25\tLA';
+    convert();
+  });
+});
+
+// FAQ accordion
+$$('.faq-item h3').forEach(h => {
+  h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+});
+
+// Auto-convert
+$('#input').addEventListener('input', convert);
+
+function convert() {
+  const raw = $('#input').value.trim();
+  if (!raw) { $('#output').textContent = ''; $('#preview').innerHTML = ''; return; }
+
+  let md = '';
+  try {
+    if (currentMode === 'html') md = convertHTML(raw);
+    else if (currentMode === 'csv') md = convertDelimited(raw, ',');
+    else md = convertDelimited(raw, '\t');
+  } catch (e) {
+    md = 'Error: ' + e.message;
+  }
+  $('#output').textContent = md;
+  if (showingPreview) renderPreview(md);
+}
+
+function convertHTML(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // Nested table warning
+  const nested = doc.querySelectorAll('table table');
+  const warn = $('#nestedWarning');
+  if (nested.length) warn.classList.add('show');
+  else warn.classList.remove('show');
+
+  const table = doc.querySelector('table');
+  if (!table) return 'No <table> found in the input.';
+
+  // Build grid
+  const rows = table.querySelectorAll('tr');
+  const grid = [];
+  const aligns = [];
+  let maxCols = 0;
+
+  rows.forEach((tr, ri) => {
+    if (!grid[ri]) grid[ri] = [];
+    const cells = tr.querySelectorAll('th, td');
+    let ci = 0;
+    cells.forEach(cell => {
+      // Find next empty column
+      while (grid[ri][ci] !== undefined) ci++;
+      const cs = parseInt(cell.getAttribute('colspan')) || 1;
+      const rs = parseInt(cell.getAttribute('rowspan')) || 1;
+      const isHeader = cell.tagName === 'TH';
+
+      // Detect alignment
+      const style = cell.getAttribute('style') || '';
+      const alignMatch = style.match(/text-align\s*:\s*(left|center|right)/i);
+      let align = 'left';
+      if (alignMatch) align = alignMatch[1].toLowerCase();
+
+      const text = cell.textContent.trim().replace(/\|/g, '\\|').replace(/\n/g, ' ');
+
+      for (let dr = 0; dr < rs; dr++) {
+        for (let dc = 0; dc < cs; dc++) {
+          const r = ri + dr;
+          if (!grid[r]) grid[r] = [];
+          const col = ci + dc;
+          grid[r][col] = { text, isHeader };
+          if (dr === 0 && dc === 0) {
+            if (!aligns[col] || align !== 'left') aligns[col] = align;
+          }
+        }
+      }
+      ci += cs;
+    });
+    maxCols = Math.max(maxCols, grid[ri].length);
+  });
+
+  // Pad rows
+  grid.forEach(row => {
+    while (row.length < maxCols) row.push({ text: '', isHeader: false });
+  });
+
+  if (grid.length === 0) return 'Empty table.';
+
+  // Find header boundary (first row with th, or first row)
+  let headerEnd = 0;
+  for (let r = 0; r < grid.length; r++) {
+    if (grid[r].some(c => c.isHeader)) { headerEnd = r + 1; }
+    else break;
+  }
+  if (headerEnd === 0) headerEnd = 1; // treat first row as header
+
+  let lines = [];
+
+  // Header rows
+  for (let r = 0; r < headerEnd; r++) {
+    lines.push('| ' + grid[r].map(c => c.text || ' ').join(' | ') + ' |');
+  }
+
+  // Separator
+  const sep = [];
+  for (let c = 0; c < maxCols; c++) {
+    const a = aligns[c] || 'left';
+    if (a === 'center') sep.push(':---:');
+    else if (a === 'right') sep.push('---:');
+    else sep.push('---');
+  }
+  lines.push('| ' + sep.join(' | ') + ' |');
+
+  // Body rows
+  for (let r = headerEnd; r < grid.length; r++) {
+    lines.push('| ' + grid[r].map(c => c.text || ' ').join(' | ') + ' |');
+  }
+
+  return lines.join('\n');
+}
+
+function convertDelimited(text, delimiter) {
+  const rows = parseDelimited(text, delimiter);
+  if (rows.length === 0) return 'No data found.';
+
+  const colCount = Math.max(...rows.map(r => r.length));
+
+  // Pad
+  rows.forEach(r => { while (r.length < colCount) r.push(''); });
+
+  const lines = [];
+
+  // Header
+  lines.push('| ' + rows[0].map(c => c.replace(/\|/g, '\\|') || ' ').join(' | ') + ' |');
+  lines.push('| ' + rows[0].map(() => '---').join(' | ') + ' |');
+
+  // Body
+  for (let r = 1; r < rows.length; r++) {
+    lines.push('| ' + rows[r].map(c => c.replace(/\|/g, '\\|') || ' ').join(' | ') + ' |');
+  }
+
+  return lines.join('\n');
+}
+
+function parseDelimited(text, delimiter) {
+  const rows = [];
+  let current = [];
+  let cell = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { cell += ch; }
+    } else {
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === delimiter) { current.push(cell.trim()); cell = ''; }
+      else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
+        current.push(cell.trim());
+        if (current.some(c => c !== '')) rows.push(current);
+        current = []; cell = '';
+        if (ch === '\r') i++;
+      } else { cell += ch; }
+    }
+  }
+  current.push(cell.trim());
+  if (current.some(c => c !== '')) rows.push(current);
+
+  return rows;
+}
+
+function copyOutput() {
+  const text = $('#output').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+}
+
+function togglePreview() {
+  showingPreview = !showingPreview;
+  const out = $('#output');
+  const prev = $('#preview');
+  if (showingPreview) {
+    out.style.display = 'none';
+    prev.style.display = 'block';
+    renderPreview($('#output').textContent);
+  } else {
+    out.style.display = '';
+    prev.style.display = 'none';
+  }
+}
+
+function renderPreview(md) {
+  const prev = $('#preview');
+  if (!md) { prev.innerHTML = ''; return; }
+  // Simple markdown table renderer
+  const lines = md.split('\n');
+  let html = '<table>';
+  let isHeader = true;
+  let pastSep = false;
+  lines.forEach(line => {
+    if (!line.startsWith('|')) return;
+    const cells = line.split('|').slice(1, -1);
+    if (cells.every(c => c.trim().match(/^:?-+:?$/))) { pastSep = true; return; }
+    const tag = !pastSep ? 'th' : 'td';
+    const aligns = [];
+    // find sep line for alignment
+    const sepLine = lines.find(l => l.startsWith('|') && l.split('|').slice(1, -1).every(c => c.trim().match(/^:?-+:?$/)));
+    if (sepLine) {
+      sepLine.split('|').slice(1, -1).forEach(c => {
+        const t = c.trim();
+        if (t.startsWith(':') && t.endsWith(':')) aligns.push('center');
+        else if (t.endsWith(':')) aligns.push('right');
+        else aligns.push('left');
+      });
+    }
+    html += '<tr>';
+    cells.forEach((c, i) => {
+      const style = aligns[i] && aligns[i] !== 'left' ? ` style="text-align:${aligns[i]}"` : '';
+      html += `<${tag}${style}>${c.trim()}</${tag}>`;
+    });
+    html += '</tr>';
+  });
+  html += '</table>';
+  prev.innerHTML = html;
+}
+
+function showToast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function sendFeedback(e) {
+  e.preventDefault();
+  const email = $('#feedbackEmail').value;
+  showToast('Thanks for your feedback!');
+  $('#feedbackEmail').value = '';
+}
+</script>
+
+</body>
+</html>
